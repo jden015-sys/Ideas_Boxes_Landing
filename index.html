@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ideas Boxes — Teaching & Learning</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: #c8d8e8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      color: #333;
+    }
+
+    /* === APP SHELL — identical dimensions to the ideas boxes === */
+    #appShell {
+      width: 90vw;
+      height: 90vh;
+      display: flex;
+      flex-direction: column;
+      background: #f4f6f8;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      font-size: clamp(11px, 0.9vw + 0.4vh, 16px);
+    }
+
+    /* === TOP NAV === */
+    .top-nav {
+      background: #2c2a4a;
+      color: white;
+      padding: 0 1.25em;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 3.5em;
+      flex-shrink: 0;
+      z-index: 200;
+    }
+
+    .top-nav h1 { font-size: 1.05em; font-weight: 500; }
+
+    .nav-badge {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: rgba(255,255,255,0.85);
+      padding: 0.3em 0.9em;
+      border-radius: 20px;
+      font-size: 0.8em;
+      letter-spacing: 0.02em;
+    }
+
+    /* === SCROLL AREA === */
+    .main-scroll {
+      flex: 1;
+      overflow-y: auto;
+      min-height: 0;
+    }
+
+    /* === INNER CONTENT === */
+    .inner {
+      max-width: 52em;
+      margin: 0 auto;
+      padding: 2em 1.25em 2.5em;
+    }
+
+    /* === HERO === */
+    .hero {
+      margin-bottom: 2em;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.78em;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #7c79a8;
+      margin-bottom: 0.5em;
+    }
+
+    .hero-title {
+      font-size: 1.9em;
+      font-weight: 700;
+      color: #2c2a4a;
+      line-height: 1.2;
+      margin-bottom: 0.55em;
+    }
+
+    .hero-title span {
+      display: inline-block;
+      background: linear-gradient(135deg, #2c2a4a 0%, #6e6aaa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-desc {
+      font-size: 0.95em;
+      color: #555;
+      line-height: 1.7;
+      max-width: 40em;
+    }
+
+    /* === DIVIDER === */
+    .divider {
+      height: 1px;
+      background: #e2e8f0;
+      margin: 1.5em 0;
+    }
+
+    /* === SECTION LABEL === */
+    .section-label {
+      font-size: 0.78em;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: #a0aec0;
+      margin-bottom: 1em;
+    }
+
+    /* === BOX GRID === */
+    .box-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 17em), 1fr));
+      gap: 1em;
+      margin-bottom: 2em;
+    }
+
+    /* === BOX CARD === */
+    .box-card {
+      background: white;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      padding: 1.25em 1.3em 1.15em;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6em;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .box-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 14px 14px 0 0;
+      opacity: 0.85;
+    }
+
+    .box-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.11);
+      border-color: #c8c6e0;
+    }
+
+    .card-icon {
+      font-size: 1.6em;
+      line-height: 1;
+      margin-bottom: 0.1em;
+    }
+
+    .card-title {
+      font-size: 1em;
+      font-weight: 600;
+      color: #2c2a4a;
+      line-height: 1.3;
+    }
+
+    .card-desc {
+      font-size: 0.84em;
+      color: #666;
+      line-height: 1.55;
+      flex: 1;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 0.3em;
+    }
+
+    .card-count {
+      font-size: 0.76em;
+      color: #888;
+      background: #f4f6f8;
+      padding: 0.2em 0.65em;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .card-arrow {
+      font-size: 0.85em;
+      color: #a0aec0;
+      transition: transform 0.15s, color 0.15s;
+    }
+
+    .box-card:hover .card-arrow {
+      transform: translateX(3px);
+      color: #2c2a4a;
+    }
+
+    /* === COMING SOON CARD === */
+    .box-card.coming-soon {
+      opacity: 0.6;
+      cursor: default;
+      pointer-events: none;
+    }
+
+    .coming-tag {
+      font-size: 0.72em;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #a0aec0;
+      background: #f0f4f8;
+      border: 1px solid #e2e8f0;
+      padding: 0.2em 0.6em;
+      border-radius: 20px;
+      align-self: flex-start;
+    }
+
+    /* === ABOUT SECTION === */
+    .about-card {
+      background: white;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      padding: 1.2em 1.4em;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .about-card p {
+      font-size: 0.87em;
+      color: #555;
+      line-height: 1.7;
+    }
+
+    .about-card p + p { margin-top: 0.75em; }
+
+    /* === FOOTER === */
+    .footer-note {
+      margin-top: 1.5em;
+      font-size: 0.78em;
+      color: #a0aec0;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    /* === SCROLL WRAP === */
+    .scroll-wrap {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+    }
+
+    .main-scroll {
+      flex: 1;
+      overflow-y: scroll;
+      min-height: 0;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .main-scroll::-webkit-scrollbar { display: none; }
+
+    /* === CUSTOM SCROLLBAR === */
+    .custom-scrollbar-track {
+      width: 10px;
+      background: #e2e8f0;
+      border-radius: 0 0 16px 0;
+      position: relative;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .custom-scrollbar-thumb {
+      width: 10px;
+      background: #2c2a4a;
+      border-radius: 5px;
+      position: absolute;
+      left: 0;
+      top: 0;
+      min-height: 40px;
+      cursor: grab;
+      transition: background 0.15s;
+    }
+    .custom-scrollbar-thumb:hover,
+    .custom-scrollbar-thumb.dragging { background: #1c1a32; cursor: grabbing; }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 600px) {
+      #appShell { width: 100vw; height: 100vh; border-radius: 0; }
+      .hero-title { font-size: 1.5em; }
+    }
+  </style>
+</head>
+<body>
+  <div id="appShell">
+
+    <!-- TOP NAV -->
+    <nav class="top-nav">
+      <h1>Teaching &amp; Learning Ideas Boxes</h1>
+      <span class="nav-badge">Hub</span>
+    </nav>
+
+    <!-- SCROLLABLE CONTENT -->
+    <div class="scroll-wrap">
+    <div class="main-scroll" id="mainScroll">
+      <div class="inner">
+
+        <!-- HERO -->
+        <div class="hero">
+          <p class="hero-eyebrow">Teaching &amp; Learning Resources</p>
+          <h2 class="hero-title"><span>Practical ideas,<br>ready to use.</span></h2>
+          <p class="hero-desc">Each Ideas Box is a searchable, filterable collection of teaching activities built around a specific topic. Browse by context, complexity, or just hit the dice to find something unexpected.</p>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- IDEAS BOXES -->
+        <p class="section-label">Available Ideas Boxes</p>
+        <div class="box-grid">
+
+          <a class="box-card" href="https://jden015-sys.github.io/Icebreaker_Ideas_Box/" target="_blank" style="--accent: #5a8fd4;">
+            <div class="card-icon">🧊</div>
+            <div class="card-title">Icebreaker Ideas Box</div>
+            <div class="card-desc">Activities for warming up a room, building rapport, and helping groups feel comfortable before the real work begins.</div>
+            <div class="card-footer">
+              <span class="card-count">Click to open</span>
+              <span class="card-arrow">→</span>
+            </div>
+          </a>
+
+          <a class="box-card" href="https://jden015-sys.github.io/Active_Learning_Ideas_Box/" target="_blank" style="--accent: #5db88a;">
+            <div class="card-icon">⚡</div>
+            <div class="card-title">Active Learning Ideas Box</div>
+            <div class="card-desc">Strategies and structured activities that move learners from passive reception to active engagement and sense-making.</div>
+            <div class="card-footer">
+              <span class="card-count">Click to open</span>
+              <span class="card-arrow">→</span>
+            </div>
+          </a>
+
+          <a class="box-card" href="https://jden015-sys.github.io/AI_in_Teaching_and_Learning_Ideas_Box/" target="_blank" style="--accent: #9b7dd4;">
+            <div class="card-icon">🤖</div>
+            <div class="card-title">AI in Teaching &amp; Learning Ideas Box</div>
+            <div class="card-desc">Activities and ideas for integrating AI tools critically and purposefully across disciplines — from prompting practice to ethics debates.</div>
+            <div class="card-footer">
+              <span class="card-count">Click to open</span>
+              <span class="card-arrow">→</span>
+            </div>
+          </a>
+
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ABOUT -->
+        <p class="section-label">About these resources</p>
+        <div class="about-card">
+          <p>These Ideas Boxes are design toolkits, not scripts. Every activity is a starting point — adapt the content, context, and facilitation to fit your students and setting. The activities were developed with AI assistance and are grounded in established pedagogical frameworks, but professional judgement and knowledge of your own learners always comes first.</p>
+          <p>Each box includes filters for delivery mode, complexity, group size, and more. Click any activity card to see full instructions, facilitation notes, and watch-outs. Use the 🎲 random button when you want serendipity.</p>
+        </div>
+
+        <p class="footer-note">More Ideas Boxes coming soon &nbsp;·&nbsp; Each box opens in a new tab</p>
+
+      </div>
+    </div><!-- .main-scroll -->
+    <div class="custom-scrollbar-track" id="scrollTrack">
+      <div class="custom-scrollbar-thumb" id="scrollThumb"></div>
+    </div>
+    </div><!-- .scroll-wrap -->
+
+  </div><!-- #appShell -->
+
+  <script>
+    const mainScroll = document.getElementById('mainScroll');
+    const scrollTrack = document.getElementById('scrollTrack');
+    const scrollThumb = document.getElementById('scrollThumb');
+
+    function updateThumb() {
+      const { scrollTop, scrollHeight, clientHeight } = mainScroll;
+      const trackH = scrollTrack.clientHeight;
+      const thumbH = Math.max(40, (clientHeight / scrollHeight) * trackH);
+      const thumbTop = scrollHeight > clientHeight
+        ? (scrollTop / (scrollHeight - clientHeight)) * (trackH - thumbH)
+        : 0;
+      scrollThumb.style.height = thumbH + 'px';
+      scrollThumb.style.top = thumbTop + 'px';
+    }
+
+    mainScroll.addEventListener('scroll', updateThumb);
+    window.addEventListener('resize', updateThumb);
+    requestAnimationFrame(updateThumb);
+
+    scrollTrack.addEventListener('click', e => {
+      if (e.target === scrollThumb) return;
+      const rect = scrollTrack.getBoundingClientRect();
+      const ratio = (e.clientY - rect.top) / rect.height;
+      mainScroll.scrollTop = ratio * (mainScroll.scrollHeight - mainScroll.clientHeight);
+    });
+
+    let isDragging = false, dragStartY = 0, dragStartScroll = 0;
+    scrollThumb.addEventListener('mousedown', e => {
+      isDragging = true;
+      dragStartY = e.clientY;
+      dragStartScroll = mainScroll.scrollTop;
+      scrollThumb.classList.add('dragging');
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      const trackH = scrollTrack.clientHeight;
+      const thumbH = scrollThumb.clientHeight;
+      const delta = e.clientY - dragStartY;
+      const scrollRange = mainScroll.scrollHeight - mainScroll.clientHeight;
+      mainScroll.scrollTop = dragStartScroll + delta * (scrollRange / (trackH - thumbH));
+    });
+    document.addEventListener('mouseup', () => {
+      isDragging = false;
+      scrollThumb.classList.remove('dragging');
+    });
+  </script>
+</body>
+</html>
